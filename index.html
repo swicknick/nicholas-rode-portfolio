@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nicholas Rode — Product Motion Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080e;
+    --bg-card: #0d0d18;
+    --bg-card-hover: #111120;
+    --accent: #9ec5e8;
+    --accent-bright: #c4dff5;
+    --accent-dim: rgba(158, 197, 232, 0.12);
+    --accent-glow: rgba(158, 197, 232, 0.25);
+    --text-primary: #f0f0f8;
+    --text-secondary: #8890a4;
+    --text-muted: #3e4455;
+    --border: rgba(158, 197, 232, 0.1);
+    --border-hover: rgba(158, 197, 232, 0.25);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: auto; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Archivo', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent); color: #08080e; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent), rgba(158,197,232,0.3)); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent-bright); }
+
+  h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── LOADER ─── */
+  #loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+
+  .loader-monogram {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(48px, 8vw, 80px);
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: loaderFadeIn 0.5s ease 0.2s forwards;
+  }
+  .loader-monogram span { color: var(--accent); }
+
+  .loader-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: loaderFadeIn 0.5s ease 0.4s forwards;
+  }
+
+  .loader-bar-wrap {
+    width: 200px; height: 1px;
+    background: rgba(158, 197, 232, 0.1);
+    border-radius: 1px;
+    overflow: hidden;
+    opacity: 0;
+    animation: loaderFadeIn 0.4s ease 0.5s forwards;
+  }
+  .loader-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: loaderProgress 1.4s cubic-bezier(0.4,0,0.2,1) 0.6s forwards;
+  }
+
+  @keyframes loaderFadeIn { to { opacity: 1; transform: none; } }
+  @keyframes loaderProgress { to { width: 100%; } }
+
+  /* ─── SCROLL PROGRESS ─── */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    z-index: 1000;
+    background: transparent;
+    pointer-events: none;
+  }
+  #scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    box-shadow: 0 0 8px var(--accent-glow);
+    transition: width 0.05s linear;
+  }
+
+  /* ─── STARS ─── */
+  #stars {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* ─── BG GRID ─── */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(158,197,232,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(158,197,232,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.6;
+  }
+
+  /* ─── NAVBAR ─── */
+  #navbar {
+    position: fixed; top: 20px; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #navbar.pill {
+    left: 50%; right: auto;
+    transform: translateX(-50%);
+    width: min(820px, calc(100vw - 40px));
+    padding: 12px 28px;
+    background: rgba(8, 8, 14, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(158,197,232,0.08);
+  }
+
+  .nav-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-logo:hover { color: var(--accent-bright); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  .nav-cta {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 8px 20px;
+    background: var(--accent-dim);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover {
+    background: var(--accent);
+    color: #08080e;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: heroFadeUp 0.8s ease 2.2s forwards;
+  }
+  .hero-eyebrow::before { content: '//  '; opacity: 0.4; }
+
+  .hero-title {
+    font-size: clamp(52px, 7vw, 100px);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: 28px;
+    max-width: 900px;
+    opacity: 0;
+    animation: heroFadeUp 0.8s ease 2.4s forwards;
+  }
+  .hero-title .accent { color: var(--accent); }
+  .hero-title .dim { color: var(--text-secondary); }
+
+  .hero-sub {
+    font-size: clamp(15px, 1.6vw, 18px);
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto 48px;
+    opacity: 0;
+    animation: heroFadeUp 0.8s ease 2.6s forwards;
+  }
+
+  .hero-ctas {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 80px;
+    opacity: 0;
+    animation: heroFadeUp 0.8s ease 2.8s forwards;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: #08080e;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 0 30px rgba(158,197,232,0.2);
+  }
+  .btn-primary:hover {
+    background: var(--accent-bright);
+    box-shadow: 0 0 40px rgba(158,197,232,0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover {
+    color: var(--accent);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  .hero-scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: heroFadeUp 0.8s ease 3.2s forwards;
+  }
+  .scroll-line {
+    width: 1px; height: 32px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+    animation: scrollPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%, 100% { opacity: 0.3; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.2); } }
+
+  /* BG ORBS */
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events: none;
+    animation: orbFloat 12s ease-in-out infinite;
+  }
+  .orb-1 { width: 500px; height: 500px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(158,197,232,0.06) 0%, transparent 70%); animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; bottom: -80px; right: -80px; background: radial-gradient(circle, rgba(158,197,232,0.05) 0%, transparent 70%); animation-delay: -6s; }
+  .orb-3 { width: 300px; height: 300px; top: 50%; right: 15%; background: radial-gradient(circle, rgba(120,160,210,0.04) 0%, transparent 70%); animation-delay: -3s; }
+  @keyframes orbFloat { 0%, 100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+
+  @keyframes heroFadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  /* ─── SCROLL ANIMATION ─── */
+  #scroll-animation {
+    position: relative;
+    height: 380vh;
+  }
+
+  .scroll-sticky {
+    position: sticky; top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #scroll-canvas {
+    display: block;
+  }
+
+  /* Annotation cards */
+  .annotation {
+    position: absolute;
+    max-width: 260px;
+    background: rgba(8, 8, 14, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .annotation.visible { opacity: 1; transform: none; }
+
+  .annotation-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .annotation-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .annotation-body {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  .annotation-stat {
+    display: inline-flex; align-items: baseline; gap: 4px;
+    margin-top: 10px;
+  }
+  .annotation-stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--accent);
+  }
+  .annotation-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* Annotation positions */
+  .annotation-1 { top: 15%; left: 6%; }
+  .annotation-2 { top: 20%; right: 6%; }
+  .annotation-3 { bottom: 22%; left: 6%; }
+  .annotation-4 { bottom: 22%; right: 6%; }
+
+  /* ─── STATS ─── */
+  #stats {
+    position: relative; z-index: 1;
+    padding: 100px 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-item::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .stat-item.counted::before { opacity: 1; }
+  .stat-item:first-child { border-radius: 16px 2px 2px 16px; }
+  .stat-item:last-child { border-radius: 2px 16px 16px 2px; }
+
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 4vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-num.glow { text-shadow: 0 0 30px rgba(158,197,232,0.5); }
+
+  .stat-suffix {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.65em;
+    color: var(--text-secondary);
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-header {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 40px;
+    margin-bottom: 60px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    display: block; width: 24px; height: 1px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  .section-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .section-title .dim { color: var(--text-muted); }
+
+  .section-sub {
+    margin-top: 16px;
+    font-size: 16px; font-weight: 300;
+    color: var(--text-secondary);
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  /* ─── WORK SECTION ─── */
+  #work {
+    position: relative; z-index: 1;
+    padding: 120px 0 80px;
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .case-study {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    group: true;
+  }
+  .case-study:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(158,197,232,0.1);
+  }
+
+  .case-study.featured { grid-column: span 7; }
+  .case-study.secondary { grid-column: span 5; }
+  .case-study.half { grid-column: span 6; }
+
+  .case-thumb {
+    aspect-ratio: 16/9;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .case-thumb-inner {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(158,197,232,0.04) 0%, rgba(20,20,40,0.8) 100%);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.5s ease;
+  }
+  .case-study:hover .case-thumb-inner { transform: scale(1.03); }
+
+  .case-thumb-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: rgba(158,197,232,0.12);
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  .case-body { padding: 24px 28px 28px; }
+
+  .case-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 12px;
+  }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(158,197,232,0.15);
+    border-radius: 100px;
+  }
+
+  .case-title {
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+  .case-study:hover .case-title { color: var(--accent-bright); }
+
+  .case-desc {
+    font-size: 14px; font-weight: 300;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .case-arrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .case-arrow svg { transition: transform 0.2s; }
+  .case-study:hover .case-arrow { color: var(--accent); }
+  .case-study:hover .case-arrow svg { transform: translateX(4px); }
+
+  /* ─── BLOG SECTION ─── */
+  #blog {
+    position: relative; z-index: 1;
+    padding: 100px 0 80px;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .blog-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .blog-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .blog-card:hover::before { opacity: 1; }
+
+  .blog-meta {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .blog-category {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 3px 10px;
+    background: var(--accent-dim);
+    border-radius: 100px;
+  }
+
+  .blog-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .blog-title {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    transition: color 0.2s;
+    flex: 1;
+  }
+  .blog-card:hover .blog-title { color: var(--accent-bright); }
+
+  .blog-excerpt {
+    font-size: 13.5px; font-weight: 300;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .blog-read-more {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+    margin-top: auto;
+    transition: color 0.2s;
+  }
+  .blog-card:hover .blog-read-more { color: var(--accent); }
+
+  /* ─── CARD SCANNER ─── */
+  #card-scanner {
+    position: relative; z-index: 1;
+    padding: 100px 40px 120px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .scanner-header { margin-bottom: 60px; }
+
+  #card-canvas {
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    border-radius: var(--radius);
+  }
+
+  .scanner-hint {
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ─── FOOTER ─── */
+  #footer {
+    position: relative; z-index: 1;
+    padding: 60px 40px;
+    border-top: 1px solid var(--border);
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+  }
+
+  .footer-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex; gap: 28px; list-style: none;
+    flex-wrap: wrap;
+  }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  /* ─── DIVIDER ─── */
+  .section-divider {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .case-study.featured, .case-study.secondary, .case-study.half {
+      grid-column: span 12;
+    }
+    #stats { grid-template-columns: repeat(2, 1fr); }
+    .stat-item:first-child { border-radius: 16px 2px 2px 2px; }
+    .stat-item:last-child { border-radius: 2px 2px 2px 16px; }
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    #navbar { padding: 0 20px; }
+    #navbar.pill { padding: 10px 20px; }
+    .nav-links { display: none; }
+    #hero { padding: 100px 24px 80px; }
+    .section-header { padding: 0 24px; }
+    .work-grid, .blog-grid { padding: 0 24px; }
+    #stats { padding: 60px 24px; gap: 2px; }
+    .blog-grid { grid-template-columns: 1fr; }
+    #footer { flex-direction: column; text-align: center; padding: 40px 24px; }
+
+    .annotation { display: none; }
+    .annotation.visible.mobile-show {
+      display: block;
+      position: fixed;
+      bottom: 20px; left: 16px; right: 16px;
+      max-width: none;
+      padding: 14px 18px;
+    }
+    .annotation .annotation-body, .annotation .annotation-stat { display: none; }
+    .annotation .annotation-title { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-monogram">NR<span>.</span></div>
+  <div class="loader-label">Loading portfolio</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- Stars -->
+<canvas id="stars"></canvas>
+
+<!-- BG Grid -->
+<div class="bg-grid"></div>
+
+<!-- Scroll progress -->
+<div id="scroll-progress"><div id="scroll-progress-bar"></div></div>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Nicholas Rode<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#card-scanner">About</a></li>
+  </ul>
+  <a href="mailto:hello@nicholasrode.com" class="nav-cta">Get in touch</a>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-eyebrow">Product Motion Designer</div>
+  <h1 class="hero-title">
+    Motion that <span class="accent">moves</span><br>
+    <span class="dim">products forward.</span>
+  </h1>
+  <p class="hero-sub">
+    I design UI animation and interactive motion systems for digital products — where craft meets usability.
+  </p>
+  <div class="hero-ctas">
+    <a href="#work" class="btn-primary">
+      View work
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="mailto:hello@nicholasrode.com" class="btn-secondary">Let's talk</a>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Scroll Animation -->
+<section id="scroll-animation">
+  <div class="scroll-sticky">
+    <canvas id="scroll-canvas"></canvas>
+
+    <div class="annotation annotation-1" data-show="0.14" data-hide="0.30">
+      <div class="annotation-num">01 / 04</div>
+      <div class="annotation-title">UI Motion Design</div>
+      <div class="annotation-body">Crafting animations that make interfaces feel precise, alive, and effortless to use.</div>
+      <div class="annotation-stat">
+        <span class="annotation-stat-num">30+</span>
+        <span class="annotation-stat-label">screens shipped</span>
+      </div>
+    </div>
+
+    <div class="annotation annotation-2" data-show="0.32" data-hide="0.50">
+      <div class="annotation-num">02 / 04</div>
+      <div class="annotation-title">Motion Systems</div>
+      <div class="annotation-body">Scalable, token-based animation frameworks that give design teams a shared language for motion.</div>
+      <div class="annotation-stat">
+        <span class="annotation-stat-num">5+</span>
+        <span class="annotation-stat-label">systems built</span>
+      </div>
+    </div>
+
+    <div class="annotation annotation-3" data-show="0.53" data-hide="0.72">
+      <div class="annotation-num">03 / 04</div>
+      <div class="annotation-title">Interaction Design</div>
+      <div class="annotation-body">Physics-based micro-interactions and gesture-driven transitions that reward attention.</div>
+    </div>
+
+    <div class="annotation annotation-4" data-show="0.74" data-hide="0.94">
+      <div class="annotation-num">04 / 04</div>
+      <div class="annotation-title">Prototyping</div>
+      <div class="annotation-body">High-fidelity motion prototypes in Framer and After Effects — production-ready from day one.</div>
+      <div class="annotation-stat">
+        <span class="annotation-stat-num">100%</span>
+        <span class="annotation-stat-label">prototype-to-ship</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section id="stats">
+  <div class="stat-item">
+    <div class="stat-num" data-target="5" data-suffix="+">0</div>
+    <div class="stat-label">Years Experience</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="30" data-suffix="+">0</div>
+    <div class="stat-label">Projects Shipped</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="12" data-suffix="">0</div>
+    <div class="stat-label">Motion Systems</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="100" data-suffix="%">0</div>
+    <div class="stat-label">Prototype to Ship</div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Work Section -->
+<section id="work">
+  <div class="section-header">
+    <div class="section-label">Selected work</div>
+    <h2 class="section-title">Case Studies<span class="dim">.</span></h2>
+    <p class="section-sub">Product UI and motion design across apps, design systems, and interactive experiences.</p>
+  </div>
+
+  <div class="work-grid">
+    <a href="#" class="case-study featured">
+      <div class="case-thumb">
+        <div class="case-thumb-inner">
+          <div class="case-thumb-label">Velocity</div>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-tags">
+          <span class="tag">UI Motion</span>
+          <span class="tag">Interaction Design</span>
+          <span class="tag">Framer</span>
+        </div>
+        <h3 class="case-title">Velocity — Fintech App Motion System</h3>
+        <p class="case-desc">End-to-end motion design for a fintech mobile app. Established animation principles, timing tokens, and a library of reusable transitions used across 40+ screens.</p>
+        <div class="case-arrow">
+          View case study
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="case-study secondary">
+      <div class="case-thumb">
+        <div class="case-thumb-inner">
+          <div class="case-thumb-label">Prism</div>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-tags">
+          <span class="tag">Motion System</span>
+          <span class="tag">Design System</span>
+        </div>
+        <h3 class="case-title">Prism — Motion Design System</h3>
+        <p class="case-desc">A comprehensive motion language for a SaaS product — easing curves, duration scales, and component-level animation specs integrated into Figma and code.</p>
+        <div class="case-arrow">
+          View case study
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="case-study half">
+      <div class="case-thumb">
+        <div class="case-thumb-inner">
+          <div class="case-thumb-label">Orbit</div>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-tags">
+          <span class="tag">Onboarding</span>
+          <span class="tag">UI Animation</span>
+        </div>
+        <h3 class="case-title">Orbit — Onboarding Flow</h3>
+        <p class="case-desc">Animated onboarding sequence for a productivity app. Reduced drop-off by 38% through choreographed transitions and contextual micro-animations.</p>
+        <div class="case-arrow">
+          View case study
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="case-study half">
+      <div class="case-thumb">
+        <div class="case-thumb-inner">
+          <div class="case-thumb-label">Kinetic</div>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="case-tags">
+          <span class="tag">Brand Motion</span>
+          <span class="tag">After Effects</span>
+        </div>
+        <h3 class="case-title">Kinetic — Brand in Motion</h3>
+        <p class="case-desc">Motion identity system for a B2B SaaS brand — logo animation, UI transition principles, and a full brand-in-motion guidelines document.</p>
+        <div class="case-arrow">
+          View case study
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<div class="section-divider" style="margin-top: 80px;"></div>
+
+<!-- Blog Section -->
+<section id="blog">
+  <div class="section-header">
+    <div class="section-label">Writing</div>
+    <h2 class="section-title">From the Blog<span class="dim">.</span></h2>
+    <p class="section-sub">Thoughts on motion design, UI animation, and building better digital products.</p>
+  </div>
+
+  <div class="blog-grid">
+    <a href="#" class="blog-card">
+      <div class="blog-meta">
+        <span class="blog-category">Motion Systems</span>
+        <span class="blog-date">2025</span>
+      </div>
+      <h3 class="blog-title">Why Every Product Needs a Motion Language</h3>
+      <p class="blog-excerpt">Animation without a system is noise. Here's how I approach building motion frameworks that scale — from timing tokens to component-level choreography.</p>
+      <div class="blog-read-more">
+        Read article
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+
+    <a href="#" class="blog-card">
+      <div class="blog-meta">
+        <span class="blog-category">UI Motion</span>
+        <span class="blog-date">2025</span>
+      </div>
+      <h3 class="blog-title">The Physics of Good UI Animation</h3>
+      <p class="blog-excerpt">Spring physics changed how I think about interface transitions. A deep dive into damping, stiffness, and why natural motion always wins over linear easing.</p>
+      <div class="blog-read-more">
+        Read article
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+
+    <a href="#" class="blog-card">
+      <div class="blog-meta">
+        <span class="blog-category">Process</span>
+        <span class="blog-date">2024</span>
+      </div>
+      <h3 class="blog-title">From Prototype to Production — Closing the Gap</h3>
+      <p class="blog-excerpt">The handoff problem is real. How I work with engineering teams to make sure motion prototypes actually ship — tools, specs, and communication patterns that work.</p>
+      <div class="blog-read-more">
+        Read article
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+  </div>
+</section>
+
+<div class="section-divider" style="margin-top: 80px;"></div>
+
+<!-- Card Scanner (Three.js) -->
+<section id="card-scanner">
+  <div class="scanner-header section-header" style="max-width: none; padding: 0; margin-bottom: 60px;">
+    <div class="section-label" style="justify-content: center;">About</div>
+    <h2 class="section-title" style="text-align: center;">Nicholas Rode<span class="dim">.</span></h2>
+    <p class="section-sub" style="margin: 16px auto 0; text-align: center;">
+      Product motion designer focused on the intersection of UI and motion — hover to explore.
+    </p>
+  </div>
+  <canvas id="card-canvas" width="700" height="420"></canvas>
+  <div class="scanner-hint">Hover to interact · Click to explode</div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div id="footer">
+    <a href="#" class="footer-logo">NR<span>.</span></a>
+    <ul class="footer-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="https://nicholasrode.framer.website/" target="_blank">Framer Site</a></li>
+      <li><a href="mailto:hello@nicholasrode.com">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2025 Nicholas Rode</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script>
+// ─── LOADER ───────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 2200);
+});
+
+// ─── STARS ────────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let W, H;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 180; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.2,
+        dx: (Math.random() - 0.5) * 0.08,
+        dy: (Math.random() - 0.5) * 0.04,
+        opacity: Math.random(),
+        twinkleSpeed: Math.random() * 0.015 + 0.005,
+        twinklePhase: Math.random() * Math.PI * 2,
+        // Slightly blue-tinted
+        r_c: Math.floor(180 + Math.random() * 50),
+        g_c: Math.floor(200 + Math.random() * 40),
+        b_c: 255,
+      });
+    }
+  }
+
+  function drawStars(t) {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => {
+      s.x += s.dx;
+      s.y += s.dy;
+      if (s.x < 0) s.x = W;
+      if (s.x > W) s.x = 0;
+      if (s.y < 0) s.y = H;
+      if (s.y > H) s.y = 0;
+      const twinkle = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.twinkleSpeed + s.twinklePhase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.r_c},${s.g_c},${s.b_c},${twinkle * 0.7})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  resize();
+  initStars();
+  requestAnimationFrame(drawStars);
+  window.addEventListener('resize', () => { resize(); initStars(); });
+})();
+
+// ─── SCROLL PROGRESS ──────────────────────────────────────────
+const scrollBar = document.getElementById('scroll-progress-bar');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+  scrollBar.style.width = pct + '%';
+}, { passive: true });
+
+// ─── NAVBAR PILL ──────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('pill', window.scrollY > 80);
+}, { passive: true });
+
+// ─── SCROLL ANIMATION ─────────────────────────────────────────
+(function() {
+  const section = document.getElementById('scroll-animation');
+  const canvas = document.getElementById('scroll-canvas');
+  const ctx = canvas.getContext('2d');
+  const TOTAL_FRAMES = 121;
+  const annotations = document.querySelectorAll('.annotation');
+
+  const images = [];
+  let loaded = 0;
+  let currentFrame = -1;
+  let rafId = null;
+  let snapping = false;
+  let snapRelease = 0;
+
+  // Determine snap zones
+  const snapZones = [];
+  annotations.forEach(ann => {
+    const show = parseFloat(ann.dataset.show);
+    const hide = parseFloat(ann.dataset.hide);
+    const snapPt = show + (hide - show) * 0.3;
+    snapZones.push({ show, hide, snapPt, el: ann, triggered: false });
+  });
+
+  function resize() {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const VIDEO_W = 1920, VIDEO_H = 1076;
+    const scale = Math.min(W / VIDEO_W, H / VIDEO_H);
+    canvas.width = Math.round(VIDEO_W * scale);
+    canvas.height = Math.round(VIDEO_H * scale);
+    canvas.style.width = canvas.width + 'px';
+    canvas.style.height = canvas.height + 'px';
+    if (currentFrame >= 0 && images[currentFrame]?.complete) drawFrame(currentFrame);
+  }
+
+  function drawFrame(idx) {
+    const img = images[idx];
+    if (!img || !img.complete) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    currentFrame = idx;
+  }
+
+  function getScrollProgress() {
+    const rect = section.getBoundingClientRect();
+    const total = section.offsetHeight - window.innerHeight;
+    const scrolled = -rect.top;
+    return Math.max(0, Math.min(1, scrolled / total));
+  }
+
+  function update() {
+    const progress = getScrollProgress();
+    const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
+
+    if (frameIdx !== currentFrame) drawFrame(frameIdx);
+
+    // Annotation visibility + snap-stop
+    let shouldSnap = false;
+    let snapTo = null;
+
+    snapZones.forEach((zone, i) => {
+      const visible = progress >= zone.show && progress < zone.hide;
+      zone.el.classList.toggle('visible', visible);
+
+      // Mobile compact
+      if (window.innerWidth <= 768) {
+        zone.el.classList.toggle('mobile-show', visible);
+      }
+
+      // Snap once per zone entry
+      if (visible && !zone.triggered && !snapping && Date.now() > snapRelease) {
+        zone.triggered = true;
+        const snapProgress = zone.snapPt;
+        const sectionTop = section.offsetTop;
+        const sectionScroll = (section.offsetHeight - window.innerHeight) * snapProgress;
+        snapTo = sectionTop + sectionScroll;
+        shouldSnap = true;
+      }
+      if (!visible) zone.triggered = false;
+    });
+
+    if (shouldSnap && snapTo !== null) {
+      snapping = true;
+      window.scrollTo({ top: snapTo, behavior: 'smooth' });
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        document.body.style.overflow = '';
+        snapping = false;
+        snapRelease = Date.now() + 600;
+      }, 700);
+    }
+
+    rafId = requestAnimationFrame(update);
+  }
+
+  // Preload all frames
+  for (let i = 1; i <= TOTAL_FRAMES; i++) {
+    const img = new Image();
+    img.src = `frames/frame_${String(i).padStart(4, '0')}.jpg`;
+    img.onload = () => {
+      loaded++;
+      if (loaded === 1) { drawFrame(0); }
+    };
+    images[i - 1] = img;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('scroll', () => {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(update);
+  }, { passive: true });
+  update();
+})();
+
+// ─── COUNT-UP STATS ───────────────────────────────────────────
+(function() {
+  const statNums = document.querySelectorAll('.stat-num');
+
+  function easeOutExpo(t) {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  }
+
+  function animateStat(el) {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1600;
+    const start = performance.now();
+    const item = el.closest('.stat-item');
+
+    el.classList.add('glow');
+    item?.classList.add('counted');
+
+    function frame(now) {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeOutExpo(t);
+      const val = Math.round(eased * target);
+      el.textContent = val + suffix;
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        el.textContent = target + suffix;
+        el.classList.remove('glow');
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateStat(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  statNums.forEach(el => observer.observe(el));
+})();
+
+// ─── CARD SCANNER (Three.js) ──────────────────────────────────
+(function() {
+  if (typeof THREE === 'undefined') return;
+
+  const canvas = document.getElementById('card-canvas');
+  const W = canvas.width, H = canvas.height;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 100);
+  camera.position.set(0, 0, 4.5);
+
+  // Create particle field that forms a "card" silhouette with NR text
+  const PARTICLE_COUNT = 3000;
+  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const targetPositions = new Float32Array(PARTICLE_COUNT * 3);
+  const colors = new Float32Array(PARTICLE_COUNT * 3);
+  const velocities = new Float32Array(PARTICLE_COUNT * 3);
+  const sizes = new Float32Array(PARTICLE_COUNT);
+
+  // Card outline + NR letter forms
+  const cardPoints = [];
+  // Card rectangle outline
+  for (let i = 0; i < 400; i++) {
+    const t = i / 400;
+    let x, y;
+    if (t < 0.25) { x = -2.8 + t * 4 * 5.6; y = 1.6; }
+    else if (t < 0.5) { x = 2.8; y = 1.6 - (t - 0.25) * 4 * 3.2; }
+    else if (t < 0.75) { x = 2.8 - (t - 0.5) * 4 * 5.6; y = -1.6; }
+    else { x = -2.8; y = -1.6 + (t - 0.75) * 4 * 3.2; }
+    cardPoints.push([x * 0.9, y * 0.9, (Math.random() - 0.5) * 0.05]);
+  }
+
+  // N letter
+  for (let i = 0; i < 200; i++) {
+    const t = i / 200;
+    if (t < 0.33) { // Left vertical
+      cardPoints.push([-1.5, -0.8 + t * 3 * 1.6, (Math.random()-0.5)*0.05]);
+    } else if (t < 0.66) { // Diagonal
+      const dt = (t - 0.33) * 3;
+      cardPoints.push([-1.5 + dt * 0.7, 0.8 - dt * 1.6, (Math.random()-0.5)*0.05]);
+    } else { // Right vertical
+      const dt = (t - 0.66) * 3;
+      cardPoints.push([-0.8, -0.8 + dt * 1.6, (Math.random()-0.5)*0.05]);
+    }
+  }
+
+  // R letter
+  for (let i = 0; i < 250; i++) {
+    const t = i / 250;
+    if (t < 0.33) { // Left vertical
+      cardPoints.push([0.2, -0.8 + t * 3 * 1.6, (Math.random()-0.5)*0.05]);
+    } else if (t < 0.66) { // Top arch (semicircle)
+      const angle = Math.PI - (t - 0.33) * 3 * Math.PI;
+      cardPoints.push([0.2 + 0.35 + Math.cos(angle) * 0.38, 0.45 + Math.sin(angle) * 0.38, (Math.random()-0.5)*0.05]);
+    } else { // Leg diagonal
+      const dt = (t - 0.66) * 3;
+      cardPoints.push([0.55 + dt * 0.45, 0.05 - dt * 0.85, (Math.random()-0.5)*0.05]);
+    }
+  }
+
+  // "Product Motion Designer" text hint as scattered dots
+  for (let i = 0; i < 150; i++) {
+    const angle = (i / 150) * Math.PI * 2;
+    const r = 0.06 + Math.random() * 0.04;
+    cardPoints.push([
+      Math.cos(angle) * r * (0.6 + Math.random() * 1.8),
+      -1.3 + (Math.random() - 0.5) * 0.15,
+      (Math.random()-0.5)*0.05
+    ]);
+  }
+
+  const N = Math.min(cardPoints.length, PARTICLE_COUNT);
+
+  // Fill remaining with scattered cloud
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    if (i < N) {
+      const [x, y, z] = cardPoints[i];
+      targetPositions[i*3] = x; targetPositions[i*3+1] = y; targetPositions[i*3+2] = z;
+    } else {
+      targetPositions[i*3] = (Math.random()-0.5)*6;
+      targetPositions[i*3+1] = (Math.random()-0.5)*4;
+      targetPositions[i*3+2] = (Math.random()-0.5)*3;
+    }
+    // Start scattered
+    positions[i*3] = (Math.random()-0.5)*12;
+    positions[i*3+1] = (Math.random()-0.5)*8;
+    positions[i*3+2] = (Math.random()-0.5)*6;
+    velocities[i*3] = velocities[i*3+1] = velocities[i*3+2] = 0;
+
+    // Color gradient: mostly pale blue with slight variation
+    const t = i / PARTICLE_COUNT;
+    colors[i*3]   = 0.55 + t * 0.3;  // R
+    colors[i*3+1] = 0.72 + t * 0.15; // G
+    colors[i*3+2] = 0.88 + t * 0.1;  // B
+
+    sizes[i] = 1.5 + Math.random() * 2.5;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  const material = new THREE.PointsMaterial({
+    size: 0.035,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.9,
+    sizeAttenuation: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+
+  let mouse = { x: 0, y: 0 };
+  let isHovered = false;
+  let isExploded = false;
+  let explodeVel = new Float32Array(PARTICLE_COUNT * 3);
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width, scaleY = H / rect.height;
+    mouse.x = ((e.clientX - rect.left) * scaleX / W) * 2 - 1;
+    mouse.y = -(((e.clientY - rect.top) * scaleY / H) * 2 - 1);
+    isHovered = true;
+  });
+  canvas.addEventListener('mouseleave', () => { isHovered = false; });
+
+  canvas.addEventListener('click', () => {
+    isExploded = !isExploded;
+    if (isExploded) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const elevation = (Math.random() - 0.5) * Math.PI;
+        const speed = 0.05 + Math.random() * 0.12;
+        explodeVel[i*3]   = Math.cos(elevation) * Math.cos(angle) * speed;
+        explodeVel[i*3+1] = Math.sin(elevation) * speed;
+        explodeVel[i*3+2] = Math.cos(elevation) * Math.sin(angle) * speed;
+      }
+    }
+  });
+
+  // Touch support
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    isExploded = !isExploded;
+    if (isExploded) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const speed = 0.05 + Math.random() * 0.1;
+        explodeVel[i*3]   = (Math.random()-0.5)*speed*2;
+        explodeVel[i*3+1] = (Math.random()-0.5)*speed*2;
+        explodeVel[i*3+2] = (Math.random()-0.5)*speed;
+      }
+    }
+  }, { passive: false });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.01;
+
+    const pos = geometry.attributes.position.array;
+    const LERP = isHovered ? 0.06 : 0.03;
+
+    if (isExploded) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        pos[i*3]   += explodeVel[i*3];
+        pos[i*3+1] += explodeVel[i*3+1];
+        pos[i*3+2] += explodeVel[i*3+2];
+        explodeVel[i*3]   *= 0.96;
+        explodeVel[i*3+1] *= 0.96;
+        explodeVel[i*3+2] *= 0.96;
+      }
+    } else {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const tx = targetPositions[i*3];
+        const ty = targetPositions[i*3+1];
+        const tz = targetPositions[i*3+2];
+
+        // Mouse repulsion
+        let mx = 0, my = 0;
+        if (isHovered) {
+          const dx = pos[i*3] - mouse.x * 3;
+          const dy = pos[i*3+1] - mouse.y * 2;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 0.8) {
+            const force = (0.8 - dist) / 0.8 * 0.04;
+            mx = dx / dist * force;
+            my = dy / dist * force;
+          }
+        }
+
+        pos[i*3]   += (tx - pos[i*3]) * LERP + mx;
+        pos[i*3+1] += (ty - pos[i*3+1]) * LERP + my;
+        pos[i*3+2] += (tz - pos[i*3+2]) * LERP;
+      }
+    }
+
+    // Gentle rotation
+    particles.rotation.y = Math.sin(t * 0.15) * 0.12;
+    particles.rotation.x = Math.sin(t * 0.08) * 0.04;
+
+    geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
