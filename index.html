@@ -789,23 +789,62 @@
     #navbar { padding: 0 20px; }
     #navbar.pill { padding: 10px 20px; }
     .nav-links { display: none; }
-    #hero { padding: 100px 24px 80px; }
-    .section-header { padding: 0 24px; }
-    .work-grid, .blog-grid { padding: 0 24px; }
-    #stats { padding: 60px 24px; gap: 2px; }
-    .blog-grid { grid-template-columns: 1fr; }
-    #footer { flex-direction: column; text-align: center; padding: 40px 24px; }
 
-    .annotation { display: none; }
-    .annotation.visible.mobile-show {
-      display: block;
+    #hero { padding: 100px 20px 80px; }
+    .hero-title { font-size: clamp(38px, 10vw, 60px); }
+
+    #scroll-animation { height: 280vh; }
+    .scroll-sticky { align-items: center; justify-content: center; }
+
+    /* Mobile annotations — single fixed strip at bottom */
+    .annotation {
+      display: none !important;
+    }
+    .annotation.mobile-visible {
+      display: flex !important;
       position: fixed;
-      bottom: 20px; left: 16px; right: 16px;
+      bottom: 24px; left: 16px; right: 16px;
       max-width: none;
       padding: 14px 18px;
+      flex-direction: row; align-items: center; gap: 12px;
+      border-radius: 12px;
+      z-index: 50;
     }
-    .annotation .annotation-body, .annotation .annotation-stat { display: none; }
-    .annotation .annotation-title { font-size: 13px; }
+    .annotation.mobile-visible .annotation-num { margin-bottom: 0; font-size: 9px; white-space: nowrap; }
+    .annotation.mobile-visible .annotation-title { font-size: 13px; margin-bottom: 0; }
+    .annotation.mobile-visible .annotation-body,
+    .annotation.mobile-visible .annotation-stat { display: none; }
+
+    #stats {
+      padding: 60px 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+    .stat-item { padding: 32px 16px; }
+
+    .section-header { padding: 0 20px; margin-bottom: 40px; }
+    .work-grid { padding: 0 20px; gap: 12px; }
+    .blog-grid { padding: 0 20px; grid-template-columns: 1fr; gap: 12px; }
+
+    #work { padding: 80px 0 60px; }
+    #blog { padding: 80px 0 60px; }
+    #card-scanner { padding: 80px 20px 100px; }
+
+    #card-canvas { width: 100% !important; height: auto !important; }
+
+    .section-divider { padding: 0 20px; }
+
+    #footer { flex-direction: column; align-items: flex-start; gap: 20px; padding: 40px 20px; }
+    .footer-links { gap: 20px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: clamp(32px, 9vw, 48px); }
+    .hero-sub { font-size: 15px; }
+    .btn-primary, .btn-secondary { padding: 12px 24px; font-size: 13px; }
+    .blog-grid { padding: 0 16px; }
+    .work-grid { padding: 0 16px; }
+    .section-header { padding: 0 16px; }
   }
 </style>
 </head>
@@ -1086,7 +1125,7 @@
       Product motion designer focused on the intersection of UI and motion — hover to explore.
     </p>
   </div>
-  <canvas id="card-canvas" width="700" height="420"></canvas>
+  <canvas id="card-canvas" width="700" height="420" style="max-width:100%;"></canvas>
   <div class="scanner-hint">Hover to interact · Click to explode</div>
 </section>
 
@@ -1189,15 +1228,15 @@ window.addEventListener('scroll', () => {
   const ctx = canvas.getContext('2d');
   const TOTAL_FRAMES = 121;
   const annotations = document.querySelectorAll('.annotation');
+  const isMobile = () => window.innerWidth <= 768;
 
   const images = [];
   let loaded = 0;
   let currentFrame = -1;
-  let rafId = null;
   let snapping = false;
   let snapRelease = 0;
 
-  // Determine snap zones
+  // Snap zones (desktop only)
   const snapZones = [];
   annotations.forEach(ann => {
     const show = parseFloat(ann.dataset.show);
@@ -1210,7 +1249,15 @@ window.addEventListener('scroll', () => {
     const W = window.innerWidth;
     const H = window.innerHeight;
     const VIDEO_W = 1920, VIDEO_H = 1076;
-    const scale = Math.min(W / VIDEO_W, H / VIDEO_H);
+
+    let scale;
+    if (isMobile()) {
+      // On mobile: fit width, let height be natural (phone stays fully visible)
+      scale = W / VIDEO_W;
+    } else {
+      scale = Math.min(W / VIDEO_W, H / VIDEO_H);
+    }
+
     canvas.width = Math.round(VIDEO_W * scale);
     canvas.height = Math.round(VIDEO_H * scale);
     canvas.style.width = canvas.width + 'px';
@@ -1239,43 +1286,40 @@ window.addEventListener('scroll', () => {
 
     if (frameIdx !== currentFrame) drawFrame(frameIdx);
 
-    // Annotation visibility + snap-stop
-    let shouldSnap = false;
-    let snapTo = null;
+    const mobile = isMobile();
 
-    snapZones.forEach((zone, i) => {
+    snapZones.forEach(zone => {
       const visible = progress >= zone.show && progress < zone.hide;
-      zone.el.classList.toggle('visible', visible);
 
-      // Mobile compact
-      if (window.innerWidth <= 768) {
-        zone.el.classList.toggle('mobile-show', visible);
-      }
+      if (mobile) {
+        // Mobile: use a single bottom-strip annotation, no snap-stop
+        zone.el.classList.toggle('mobile-visible', visible);
+        zone.el.classList.remove('visible');
+      } else {
+        // Desktop: positioned annotations + snap-stop
+        zone.el.classList.toggle('visible', visible);
+        zone.el.classList.remove('mobile-visible');
 
-      // Snap once per zone entry
-      if (visible && !zone.triggered && !snapping && Date.now() > snapRelease) {
-        zone.triggered = true;
-        const snapProgress = zone.snapPt;
-        const sectionTop = section.offsetTop;
-        const sectionScroll = (section.offsetHeight - window.innerHeight) * snapProgress;
-        snapTo = sectionTop + sectionScroll;
-        shouldSnap = true;
+        if (visible && !zone.triggered && !snapping && Date.now() > snapRelease) {
+          zone.triggered = true;
+          const sectionTop = section.offsetTop;
+          const sectionScroll = (section.offsetHeight - window.innerHeight) * zone.snapPt;
+          const snapTo = sectionTop + sectionScroll;
+
+          snapping = true;
+          window.scrollTo({ top: snapTo, behavior: 'smooth' });
+          document.body.style.overflow = 'hidden';
+          setTimeout(() => {
+            document.body.style.overflow = '';
+            snapping = false;
+            snapRelease = Date.now() + 600;
+          }, 700);
+        }
+        if (!visible) zone.triggered = false;
       }
-      if (!visible) zone.triggered = false;
     });
 
-    if (shouldSnap && snapTo !== null) {
-      snapping = true;
-      window.scrollTo({ top: snapTo, behavior: 'smooth' });
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => {
-        document.body.style.overflow = '';
-        snapping = false;
-        snapRelease = Date.now() + 600;
-      }, 700);
-    }
-
-    rafId = requestAnimationFrame(update);
+    requestAnimationFrame(update);
   }
 
   // Preload all frames
@@ -1284,18 +1328,15 @@ window.addEventListener('scroll', () => {
     img.src = `frames/frame_${String(i).padStart(4, '0')}.jpg`;
     img.onload = () => {
       loaded++;
-      if (loaded === 1) { drawFrame(0); }
+      if (loaded === 1) drawFrame(0);
     };
     images[i - 1] = img;
   }
 
   resize();
   window.addEventListener('resize', resize);
-  window.addEventListener('scroll', () => {
-    cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(update);
-  }, { passive: true });
-  update();
+  // Run continuously — never miss a frame on iOS
+  requestAnimationFrame(update);
 })();
 
 // ─── COUNT-UP STATS ───────────────────────────────────────────
