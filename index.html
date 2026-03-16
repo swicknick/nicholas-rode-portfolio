@@ -1287,8 +1287,8 @@ window.addEventListener('scroll', () => {
 
     let scale;
     if (isMobile()) {
-      // On mobile: scale by height so phone fills the screen vertically; sides clip under overflow:hidden
-      scale = H / VIDEO_H;
+      // On mobile: scale to ~70% of viewport height — not so small it looks tiny, not so big it bleeds
+      scale = (H * 0.7) / VIDEO_H;
     } else {
       scale = Math.min(W / VIDEO_W, H / VIDEO_H);
     }
