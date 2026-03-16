@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shep — Nicholas Rode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: #08080e;
+      color: #f0f0f8;
+      font-family: 'Archivo', sans-serif;
+      font-weight: 400;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,8,14,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(158,197,232,0.1);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #f0f0f8;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: #8890a4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #f0f0f8; }
+    .nav-cta {
+      background: #9ec5e8;
+      color: #08080e !important;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500 !important;
+      font-size: 0.875rem !important;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .nav-cta:hover { opacity: 0.85; color: #08080e !important; }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* LAYOUT */
+    .page-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* BACK */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #8890a4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #f0f0f8; }
+
+    /* HERO */
+    .hero { margin-bottom: 40px; }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: #8890a4;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #8890a4;
+    }
+    .meta-row .meta-sep { color: rgba(158,197,232,0.1); }
+    .meta-row .meta-label { color: #8890a4; }
+    .meta-row .meta-value { color: #f0f0f8; font-weight: 500; }
+    .meta-live a {
+      color: #9ec5e8;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .meta-live a:hover { opacity: 0.8; }
+
+    /* THUMBNAIL */
+    .thumbnail {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 56px;
+      border: 1px solid rgba(158,197,232,0.1);
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .content h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      letter-spacing: -0.01em;
+      margin: 48px 0 16px;
+      color: #f0f0f8;
+    }
+    .content h1:first-child { margin-top: 0; }
+    .content h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      letter-spacing: -0.01em;
+      margin: 36px 0 12px;
+      color: #f0f0f8;
+    }
+    .content p {
+      font-size: 1rem;
+      color: #d0d0d0;
+      margin-bottom: 16px;
+      line-height: 1.75;
+    }
+    .content p:empty, .content br { display: none; }
+    .content strong { color: #f0f0f8; font-weight: 500; }
+    .content a { color: #9ec5e8; }
+    .content ol, .content ul {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+    .content li {
+      color: #d0d0d0;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .content li p { margin-bottom: 0; }
+    .content video {
+      width: 100%;
+      border-radius: 12px;
+      margin: 24px 0;
+      display: block;
+    }
+    .content img {
+      width: 100%;
+      border-radius: 12px;
+      margin: 24px 0;
+      display: block;
+    }
+    .content pre {
+      background: #0d0d18;
+      border: 1px solid rgba(158,197,232,0.1);
+      border-radius: 12px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      margin: 24px 0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+    .content code {
+      font-family: 'JetBrains Mono', monospace;
+      color: #9ec5e8;
+      font-size: 0.875rem;
+    }
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.9rem;
+    }
+    .content th {
+      background: #0d0d18;
+      color: #f0f0f8;
+      font-weight: 500;
+      padding: 12px 16px;
+      text-align: left;
+      border: 1px solid rgba(158,197,232,0.1);
+    }
+    .content td {
+      padding: 10px 16px;
+      border: 1px solid rgba(158,197,232,0.1);
+      color: #d0d0d0;
+    }
+    .content tr:nth-child(even) td { background: rgba(13,13,24,0.5); }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: #8890a4;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(158,197,232,0.1);
+      margin-top: 80px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .page-wrapper { padding: 32px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">NR.</a>
+  <ul class="nav-links">
+    <li><a href="../index.html#work">Works</a></li>
+    <li><a href="../index.html#blog">Blog</a></li>
+    <li><a href="../index.html#card-scanner">About</a></li>
+    <li><a href="mailto:hello@nicholasrode.com">Contact</a></li>
+  </ul>
+  <a href="mailto:hello@nicholasrode.com" class="nav-cta">Get in touch</a>
+</nav>
+
+<div class="page-wrapper">
+  <a href="../index.html" class="back-link">← Back</a>
+
+  <div class="hero">
+    <h1>Shep</h1>
+    <p class="hero-tagline">Bringing clarity and motion to a complex rebrand.</p>
+    <div class="meta-row">
+      <span class="meta-value">2025</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-value">Illustration, Motion Design</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-value">Motion Design, Illustration, Animation</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-live"><a href="https://www.shep.io/" target="_blank" rel="noopener">shep.io ↗</a></span>
+    </div>
+  </div>
+
+  <img class="thumbnail" src="https://framerusercontent.com/images/BKx2UvJvkyqQOw8RALAjG1xGaM.png" alt="Shep thumbnail">
+
+  <div class="content">
+    <h1>Opportunity</h1><p>Shep (formerly Edisoft) helps businesses streamline their entire supply-chain process through a connected platform they call the <strong>Shep Fabric</strong>. The goal was to visually explain how their technology simplifies what's normally a messy, disjointed system—turning chaos into order through clear, approachable motion and design.</p><p><br></p><h1>Contributions</h1><h2>I. Hero Animation</h2><p>The hero piece centered on interaction with the <strong>Shep Fabric</strong>— a visual layer representing how Shep connects all moving parts of a business. The motion invites users to explore, showing how the fabric weaves data and processes together in real time.</p><p><br></p><video autoplay loop muted playsinline src="https://framerusercontent.com/images/vVDabiBUKTarpJUzbQorYsGVulU.mp4"></video><h1><br></h1><h2>II. Spaghetti to Blueprint</h2><p>Transforms a tangled, chaotic system into a clean, structured diagram—Shep's core promise in one visual metaphor.</p><p><br></p><video autoplay loop muted playsinline src="https://framerusercontent.com/images/AKuRrn9uzRecpoklzGkiHE5q4s.mp4"></video><h2><br></h2><h2>III. System Animations</h2><p>A series of five short, connected animations built in Rive to explain how Shep's platform works.</p><p><br></p><video autoplay loop muted playsinline src="https://framerusercontent.com/images/pew9de5fkrvD3qelrikh2j6wfHc.mp4"></video><p><br></p><ol><li><p><strong>Automate</strong> – Demonstrates Shep's ability to remove manual effort by connecting systems and triggering actions automatically.</p></li></ol><video autoplay loop muted playsinline src="https://framerusercontent.com/images/C86uhpxCQbwOocIRuIwjsEDNaI.mp4"></video><ol><li><p><strong>Protect</strong> – Visualizes secure data handling and error prevention through stable, reinforcing motion cues.</p></li></ol><video autoplay loop muted playsinline src="https://framerusercontent.com/images/oYTxPn30vQs613YlkcOsDklA.mp4"></video><ol><li><p><strong>See Everything</strong> – Expands outward to show visibility across an entire network.</p></li></ol><video autoplay loop muted playsinline src="https://framerusercontent.com/images/IEmsfXEkVN3gFegEURc99ioRXbo.mp4"></video><ol><li><p><strong>Scale</strong> – Builds upward in motion and form, representing growth and adaptability.</p></li></ol><video autoplay loop muted playsinline src="https://framerusercontent.com/images/yryZ0SrqxQLgo4kCEOg7yajg.mp4"></video><ol><li><p><strong>Launch Fast</strong> – Smooth, accelerating animation that captures how Shep speeds up deployment.</p></li></ol><h2>IV. Architecture of Modern Integration Illustrations</h2><p>A three-part illustration series designed to visualize Shep's architecture principles.</p><img alt="" src="https://framerusercontent.com/images/Gym9e2bkUj0DEF2dltGe4W7ts.png"><ol><li><p><strong>One Language</strong> – Represents Shep's ability to standardize communication across different tools and systems.</p></li></ol><img alt="" src="https://framerusercontent.com/images/DSqx1XGYdlqddXCmtO14Hk3jc.png"><ol><li><p><strong>Decoupled Systems</strong> – Illustrates how Shep separates dependencies between tools.</p></li></ol><img alt="" src="https://framerusercontent.com/images/bssBzJoDCvGhUlB0gduzu0nU4.png"><ol><li><p><strong>Centralized Logic and Observability</strong> – Shows how Shep brings intelligence and oversight into a single view.</p></li></ol><h2>V. Technical Considerations</h2><img alt="" src="https://framerusercontent.com/images/SmhXSk5VynvuBAXo47VAtyZHyuQ.png"><h1>Final Thoughts</h1><p>For Shep, I helped translate a complex platform and rebrand into simple, meaningful visuals that move. Built entirely in Rive, each animation balances clarity and personality—turning abstract ideas like automation, security, and scale into something users can instantly understand and connect with.</p><p>This project pushed me to grow across illustration, motion, and collaboration—refining how I approach iterative design, technical workflows, and client feedback. It's easily one of the most rewarding learning experiences I've had as a designer.</p><p><br></p><p>Thanks for reading.</p>
+  </div>
+</div>
+
+<footer>© 2025 Nicholas Rode</footer>
+
+</body>
+</html>

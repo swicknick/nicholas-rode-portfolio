@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluate Website — Nicholas Rode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: #08080e;
+      color: #f0f0f8;
+      font-family: 'Archivo', sans-serif;
+      font-weight: 400;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,8,14,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(158,197,232,0.1);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #f0f0f8;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: #8890a4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #f0f0f8; }
+    .nav-cta {
+      background: #9ec5e8;
+      color: #08080e !important;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500 !important;
+      font-size: 0.875rem !important;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+    .page-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #8890a4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #f0f0f8; }
+    .hero { margin-bottom: 40px; }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: #8890a4;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .meta-row .meta-sep { color: rgba(158,197,232,0.1); }
+    .meta-row .meta-value { color: #f0f0f8; font-weight: 500; }
+    .meta-live a { color: #9ec5e8; text-decoration: none; font-weight: 500; }
+    .meta-live a:hover { opacity: 0.8; }
+    .thumbnail {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 56px;
+      border: 1px solid rgba(158,197,232,0.1);
+    }
+    .content { max-width: 760px; margin: 0 auto; }
+    .content h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      letter-spacing: -0.01em;
+      margin: 48px 0 16px;
+      color: #f0f0f8;
+    }
+    .content h1:first-child { margin-top: 0; }
+    .content h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      letter-spacing: -0.01em;
+      margin: 36px 0 12px;
+      color: #f0f0f8;
+    }
+    .content p { font-size: 1rem; color: #d0d0d0; margin-bottom: 16px; line-height: 1.75; }
+    .content p:empty, .content br { display: none; }
+    .content strong { color: #f0f0f8; font-weight: 500; }
+    .content a { color: #9ec5e8; }
+    .content ol, .content ul { padding-left: 24px; margin-bottom: 16px; }
+    .content li { color: #d0d0d0; margin-bottom: 8px; font-size: 1rem; line-height: 1.75; }
+    .content li p { margin-bottom: 0; }
+    .content video { width: 100%; border-radius: 12px; margin: 24px 0; display: block; }
+    .content img { width: 100%; border-radius: 12px; margin: 24px 0; display: block; }
+    .content pre { background: #0d0d18; border: 1px solid rgba(158,197,232,0.1); border-radius: 12px; padding: 20px 24px; overflow-x: auto; margin: 24px 0; }
+    .content code { font-family: 'JetBrains Mono', monospace; color: #9ec5e8; font-size: 0.875rem; }
+    .content table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9rem; }
+    .content th { background: #0d0d18; color: #f0f0f8; font-weight: 500; padding: 12px 16px; text-align: left; border: 1px solid rgba(158,197,232,0.1); }
+    .content td { padding: 10px 16px; border: 1px solid rgba(158,197,232,0.1); color: #d0d0d0; }
+    .content tr:nth-child(even) td { background: rgba(13,13,24,0.5); }
+    footer { text-align: center; padding: 32px 24px; color: #8890a4; font-size: 0.85rem; border-top: 1px solid rgba(158,197,232,0.1); margin-top: 80px; }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .page-wrapper { padding: 32px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">NR.</a>
+  <ul class="nav-links">
+    <li><a href="../index.html#work">Works</a></li>
+    <li><a href="../index.html#blog">Blog</a></li>
+    <li><a href="../index.html#card-scanner">About</a></li>
+    <li><a href="mailto:hello@nicholasrode.com">Contact</a></li>
+  </ul>
+  <a href="mailto:hello@nicholasrode.com" class="nav-cta">Get in touch</a>
+</nav>
+
+<div class="page-wrapper">
+  <a href="../index.html" class="back-link">← Back</a>
+
+  <div class="hero">
+    <h1>Evaluate Website</h1>
+    <p class="hero-tagline">Web Design and Motion</p>
+    <div class="meta-row">
+      <span class="meta-value">2023</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-value">Design</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-value">UX/UI, Motion</span>
+      <span class="meta-sep">|</span>
+      <span class="meta-live"><a href="https://evaluate.xyz/" target="_blank" rel="noopener">evaluate.xyz ↗</a></span>
+    </div>
+  </div>
+
+  <img class="thumbnail" src="https://framerusercontent.com/images/Q0mg2P1I4Ym6zvBiB33Tx5SFlKo.png" alt="Evaluate Website thumbnail">
+
+  <div class="content">
+    <h1>Introduction</h1><p>Evaluate.xyz is a p2p NFT trading application with a live chat feature. It operates on the Flow blockchain and can connect multiple different wallet types. I was on the team that designed the UX/UI for this app and website.</p><p><br></p><video autoplay loop muted playsinline src="https://framerusercontent.com/images/5cUpzCVAKUbavFKFJ5AvxwNi2E.mp4"></video><h1>Design</h1><h2>I. Website</h2><p>Designed the marketing website to communicate the platform's core value proposition—fast, secure, peer-to-peer NFT trading. The visual language draws from crypto-native aesthetics while remaining approachable to new users.</p><h2>II. Motion</h2><p>Scroll-triggered animations and page transitions were added to bring energy and momentum to the experience. Key sections animate in with staggered reveals, and interactive elements respond with satisfying micro-interactions.</p><h1>Final Thoughts</h1><p>Evaluate was an early project that taught me a lot about designing for emerging tech—where the audience is both technical and skeptical. Clarity and confidence were the guiding principles throughout.</p><p><br></p><p>Thanks for reading.</p>
+  </div>
+</div>
+
+<footer>© 2025 Nicholas Rode</footer>
+
+</body>
+</html>
