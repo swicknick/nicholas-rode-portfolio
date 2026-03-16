@@ -412,60 +412,60 @@
   .annotation-3 { bottom: 22%; left: 6%; }
   .annotation-4 { bottom: 22%; right: 6%; }
 
-  /* ─── STATS ─── */
-  #stats {
+  /* ─── MARQUEE ─── */
+  #marquee-wrap {
     position: relative; z-index: 1;
-    padding: 100px 40px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .stat-item {
-    text-align: center;
-    padding: 48px 24px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    position: relative;
     overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+    background: var(--bg-card);
   }
-  .stat-item::before {
+  #marquee-wrap::before,
+  #marquee-wrap::after {
     content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0;
-    transition: opacity 0.4s;
+    position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2;
+    pointer-events: none;
   }
-  .stat-item.counted::before { opacity: 1; }
-  .stat-item:first-child { border-radius: 16px 2px 2px 16px; }
-  .stat-item:last-child { border-radius: 2px 16px 16px 2px; }
+  #marquee-wrap::before { left: 0; background: linear-gradient(90deg, var(--bg-card), transparent); }
+  #marquee-wrap::after  { right: 0; background: linear-gradient(-90deg, var(--bg-card), transparent); }
 
-  .stat-num {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(36px, 4vw, 52px);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 8px;
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 22s linear infinite;
   }
-  .stat-num.glow { text-shadow: 0 0 30px rgba(158,197,232,0.5); }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-track:hover { animation-play-state: paused; }
 
-  .stat-suffix {
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 28px 40px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .marquee-text {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.65em;
+    font-size: clamp(15px, 1.5vw, 18px);
+    font-weight: 500;
+    letter-spacing: 0.01em;
     color: var(--text-secondary);
-  }
-
-  .stat-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--text-muted);
     text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: color 0.2s;
+  }
+  .marquee-item:hover .marquee-text { color: var(--text-primary); }
+  .marquee-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.5;
+    flex-shrink: 0;
   }
 
   /* ─── SECTION HEADERS ─── */
@@ -783,9 +783,6 @@
     .case-study.featured, .case-study.secondary, .case-study.half {
       grid-column: span 12;
     }
-    #stats { grid-template-columns: repeat(2, 1fr); }
-    .stat-item:first-child { border-radius: 16px 2px 2px 2px; }
-    .stat-item:last-child { border-radius: 2px 2px 2px 16px; }
     .blog-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
@@ -818,13 +815,6 @@
     .annotation.mobile-visible .annotation-title { font-size: 13px; margin-bottom: 0; }
     .annotation.mobile-visible .annotation-body,
     .annotation.mobile-visible .annotation-stat { display: none; }
-
-    #stats {
-      padding: 60px 20px;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
-    }
-    .stat-item { padding: 32px 16px; }
 
     .section-header { padding: 0 20px; margin-bottom: 40px; }
     .work-grid { padding: 0 20px; gap: 12px; }
@@ -953,25 +943,23 @@
   </div>
 </section>
 
-<!-- Stats -->
-<section id="stats">
-  <div class="stat-item">
-    <div class="stat-num" data-target="5" data-suffix="+">0</div>
-    <div class="stat-label">Years Experience</div>
+<!-- Marquee -->
+<div id="marquee-wrap">
+  <div class="marquee-track">
+    <!-- first copy -->
+    <div class="marquee-item"><span class="marquee-text">Motion Graphics</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">UI Design</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Product Motion</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Interactive Design</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">AI</span><span class="marquee-dot"></span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item"><span class="marquee-text">Motion Graphics</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">UI Design</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Product Motion</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">Interactive Design</span><span class="marquee-dot"></span></div>
+    <div class="marquee-item"><span class="marquee-text">AI</span><span class="marquee-dot"></span></div>
   </div>
-  <div class="stat-item">
-    <div class="stat-num" data-target="30" data-suffix="+">0</div>
-    <div class="stat-label">Projects Shipped</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" data-target="12" data-suffix="">0</div>
-    <div class="stat-label">Motion Systems</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" data-target="100" data-suffix="%">0</div>
-    <div class="stat-label">Prototype to Ship</div>
-  </div>
-</section>
+</div>
 
 <div class="section-divider"></div>
 
@@ -1386,50 +1374,6 @@ window.addEventListener('scroll', () => {
   requestAnimationFrame(update);
 })();
 
-// ─── COUNT-UP STATS ───────────────────────────────────────────
-(function() {
-  const statNums = document.querySelectorAll('.stat-num');
-
-  function easeOutExpo(t) {
-    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-  }
-
-  function animateStat(el) {
-    const target = parseInt(el.dataset.target);
-    const suffix = el.dataset.suffix || '';
-    const duration = 1600;
-    const start = performance.now();
-    const item = el.closest('.stat-item');
-
-    el.classList.add('glow');
-    item?.classList.add('counted');
-
-    function frame(now) {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / duration);
-      const eased = easeOutExpo(t);
-      const val = Math.round(eased * target);
-      el.textContent = val + suffix;
-      if (t < 1) requestAnimationFrame(frame);
-      else {
-        el.textContent = target + suffix;
-        el.classList.remove('glow');
-      }
-    }
-    requestAnimationFrame(frame);
-  }
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        animateStat(entry.target);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.4 });
-
-  statNums.forEach(el => observer.observe(el));
-})();
 
 // ─── CARD SCANNER (Three.js) ──────────────────────────────────
 (function() {
