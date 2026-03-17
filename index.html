@@ -1321,24 +1321,23 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
 // ─── CONTACT FORM ─────────────────────────────────────────────
-// To activate: go to formspree.io, create a free form with theniceguynick@gmail.com,
-// then replace YOUR_FORM_ID below with the ID they give you (e.g. "xpwzgkbd")
-const FORMSPREE_ID = 'YOUR_FORM_ID';
-
 document.getElementById('contact-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = e.target.querySelector('button[type=submit]');
   const status = document.getElementById('form-status');
   btn.disabled = true;
   btn.textContent = 'Sending…';
-  status.className = '';
   status.classList.remove('visible', 'error');
 
+  const { value: name } = document.getElementById('cf-name');
+  const { value: email } = document.getElementById('cf-email');
+  const { value: message } = document.getElementById('cf-message');
+
   try {
-    const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+    const res = await fetch('/api/contact', {
       method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: new FormData(e.target),
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, message }),
     });
     if (res.ok) {
       status.textContent = '✓ Message sent — I\'ll be in touch soon.';
@@ -1348,7 +1347,7 @@ document.getElementById('contact-form').addEventListener('submit', async (e) => 
       throw new Error();
     }
   } catch {
-    status.textContent = 'Something went wrong — try emailing theniceguynick@gmail.com directly.';
+    status.textContent = 'Something went wrong — please try again.';
     status.classList.add('visible', 'error');
   } finally {
     btn.disabled = false;
