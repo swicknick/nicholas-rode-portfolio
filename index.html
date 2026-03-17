@@ -306,6 +306,9 @@
     text-transform: uppercase;
     opacity: 0;
     animation: heroFadeUp 0.8s ease 3.2s forwards;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    white-space: nowrap;
   }
   .scroll-line {
     width: 1px; height: 32px;
@@ -330,7 +333,7 @@
   /* ─── SCROLL ANIMATION ─── */
   #scroll-animation {
     position: relative;
-    height: 380vh;
+    height: 250vh;
   }
 
   .scroll-sticky {
@@ -794,7 +797,7 @@
     #hero { padding: 100px 20px 80px; }
     .hero-title { font-size: clamp(38px, 10vw, 60px); }
 
-    #scroll-animation { height: 320vh; }
+    #scroll-animation { height: 200vh; }
     .scroll-sticky { align-items: center; justify-content: center; }
 
     /* Mobile annotations — single fixed strip at bottom */
@@ -907,38 +910,26 @@
 
     <div class="annotation annotation-1" data-show="0.14" data-hide="0.30">
       <div class="annotation-num">01 / 04</div>
-      <div class="annotation-title">UI Motion Design</div>
-      <div class="annotation-body">Crafting animations that make interfaces feel precise, alive, and effortless to use.</div>
-      <div class="annotation-stat">
-        <span class="annotation-stat-num">30+</span>
-        <span class="annotation-stat-label">screens shipped</span>
-      </div>
+      <div class="annotation-title">Product Motion</div>
+      <div class="annotation-body">Scroll-driven, launch-ready motion that makes products feel alive from first scroll to final tap.</div>
     </div>
 
     <div class="annotation annotation-2" data-show="0.32" data-hide="0.50">
       <div class="annotation-num">02 / 04</div>
-      <div class="annotation-title">Motion Systems</div>
-      <div class="annotation-body">Scalable, token-based animation frameworks that give design teams a shared language for motion.</div>
-      <div class="annotation-stat">
-        <span class="annotation-stat-num">5+</span>
-        <span class="annotation-stat-label">systems built</span>
-      </div>
+      <div class="annotation-title">UI Design</div>
+      <div class="annotation-body">Clean, component-driven interfaces built for clarity, hierarchy, and seamless developer handoff.</div>
     </div>
 
     <div class="annotation annotation-3" data-show="0.53" data-hide="0.72">
       <div class="annotation-num">03 / 04</div>
-      <div class="annotation-title">Interaction Design</div>
-      <div class="annotation-body">Physics-based micro-interactions and gesture-driven transitions that reward attention.</div>
+      <div class="annotation-title">Interactive Design</div>
+      <div class="annotation-body">Rive and Framer experiences that blur the line between prototype and production.</div>
     </div>
 
     <div class="annotation annotation-4" data-show="0.74" data-hide="0.94">
       <div class="annotation-num">04 / 04</div>
-      <div class="annotation-title">Prototyping</div>
-      <div class="annotation-body">High-fidelity motion prototypes in Framer and After Effects — production-ready from day one.</div>
-      <div class="annotation-stat">
-        <span class="annotation-stat-num">100%</span>
-        <span class="annotation-stat-label">prototype-to-ship</span>
-      </div>
+      <div class="annotation-title">AI</div>
+      <div class="annotation-body">Motion and UI work for AI products — surfacing intelligence through expressive, human-centered design.</div>
     </div>
   </div>
 </section>
@@ -1256,6 +1247,14 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('pill', window.scrollY > 80);
 }, { passive: true });
 
+// ─── SCROLL HINT FADE ─────────────────────────────────────────
+const scrollHint = document.querySelector('.hero-scroll-hint');
+window.addEventListener('scroll', () => {
+  if (!scrollHint) return;
+  const fade = Math.max(0, 1 - window.scrollY / 80);
+  scrollHint.style.opacity = fade;
+}, { passive: true });
+
 // ─── SCROLL ANIMATION ─────────────────────────────────────────
 (function() {
   const section = document.getElementById('scroll-animation');
@@ -1392,63 +1391,60 @@ window.addEventListener('scroll', () => {
   camera.position.set(0, 0, 4.5);
 
   // Create particle field that forms a "card" silhouette with NR text
-  const PARTICLE_COUNT = 3000;
+  const PARTICLE_COUNT = 5000;
   const positions = new Float32Array(PARTICLE_COUNT * 3);
   const targetPositions = new Float32Array(PARTICLE_COUNT * 3);
   const colors = new Float32Array(PARTICLE_COUNT * 3);
   const velocities = new Float32Array(PARTICLE_COUNT * 3);
   const sizes = new Float32Array(PARTICLE_COUNT);
 
-  // Card outline + NR letter forms
+  // ── Helper: add a straight stroke sampled at `count` points ──
   const cardPoints = [];
-  // Card rectangle outline
-  for (let i = 0; i < 400; i++) {
-    const t = i / 400;
-    let x, y;
-    if (t < 0.25) { x = -2.8 + t * 4 * 5.6; y = 1.6; }
-    else if (t < 0.5) { x = 2.8; y = 1.6 - (t - 0.25) * 4 * 3.2; }
-    else if (t < 0.75) { x = 2.8 - (t - 0.5) * 4 * 5.6; y = -1.6; }
-    else { x = -2.8; y = -1.6 + (t - 0.75) * 4 * 3.2; }
-    cardPoints.push([x * 0.9, y * 0.9, (Math.random() - 0.5) * 0.05]);
+  const jitter = () => (Math.random() - 0.5) * 0.018;
+  function stroke(x1, y1, x2, y2, count) {
+    for (let i = 0; i < count; i++) {
+      const t = i / Math.max(1, count - 1);
+      cardPoints.push([x1 + (x2-x1)*t + jitter(), y1 + (y2-y1)*t + jitter(), jitter()*2]);
+    }
   }
-
-  // N letter
-  for (let i = 0; i < 200; i++) {
-    const t = i / 200;
-    if (t < 0.33) { // Left vertical
-      cardPoints.push([-1.5, -0.8 + t * 3 * 1.6, (Math.random()-0.5)*0.05]);
-    } else if (t < 0.66) { // Diagonal
-      const dt = (t - 0.33) * 3;
-      cardPoints.push([-1.5 + dt * 0.7, 0.8 - dt * 1.6, (Math.random()-0.5)*0.05]);
-    } else { // Right vertical
-      const dt = (t - 0.66) * 3;
-      cardPoints.push([-0.8, -0.8 + dt * 1.6, (Math.random()-0.5)*0.05]);
+  function arc(cx, cy, rx, ry, a0, a1, count) {
+    for (let i = 0; i < count; i++) {
+      const t = i / Math.max(1, count - 1);
+      const a = a0 + (a1 - a0) * t;
+      cardPoints.push([cx + rx*Math.cos(a) + jitter(), cy + ry*Math.sin(a) + jitter(), jitter()*2]);
     }
   }
 
-  // R letter
-  for (let i = 0; i < 250; i++) {
-    const t = i / 250;
-    if (t < 0.33) { // Left vertical
-      cardPoints.push([0.2, -0.8 + t * 3 * 1.6, (Math.random()-0.5)*0.05]);
-    } else if (t < 0.66) { // Top arch (semicircle)
-      const angle = Math.PI - (t - 0.33) * 3 * Math.PI;
-      cardPoints.push([0.2 + 0.35 + Math.cos(angle) * 0.38, 0.45 + Math.sin(angle) * 0.38, (Math.random()-0.5)*0.05]);
-    } else { // Leg diagonal
-      const dt = (t - 0.66) * 3;
-      cardPoints.push([0.55 + dt * 0.45, 0.05 - dt * 0.85, (Math.random()-0.5)*0.05]);
-    }
-  }
+  // ── Card outline (rounded rect) ──────────────────────────────
+  const cW = 2.55, cH = 1.55, cR = 0.22;
+  stroke(-cW+cR,  cH,  cW-cR,  cH,  160); // top
+  stroke(-cW+cR, -cH,  cW-cR, -cH,  160); // bottom
+  stroke(-cW, -cH+cR, -cW,  cH-cR,  90);  // left
+  stroke( cW, -cH+cR,  cW,  cH-cR,  90);  // right
+  arc(-cW+cR,  cH-cR, cR, cR,  Math.PI/2,   Math.PI,      18); // TL
+  arc( cW-cR,  cH-cR, cR, cR,  0,            Math.PI/2,   18); // TR
+  arc(-cW+cR, -cH+cR, cR, cR,  Math.PI,     3*Math.PI/2,  18); // BL
+  arc( cW-cR, -cH+cR, cR, cR, -Math.PI/2,   0,            18); // BR
 
-  // "Product Motion Designer" text hint as scattered dots
-  for (let i = 0; i < 150; i++) {
-    const angle = (i / 150) * Math.PI * 2;
-    const r = 0.06 + Math.random() * 0.04;
-    cardPoints.push([
-      Math.cos(angle) * r * (0.6 + Math.random() * 1.8),
-      -1.3 + (Math.random() - 0.5) * 0.15,
-      (Math.random()-0.5)*0.05
-    ]);
+  // ── N  (centered at x = -0.82) ───────────────────────────────
+  // Dimensions: width = 1.10, height = 1.30
+  const nL = -1.37, nR = -0.27, nT = 0.65, nB = -0.65;
+  stroke(nL, nB, nL, nT, 220);           // left vertical
+  stroke(nL, nT, nR, nB, 190);           // diagonal  (top-left → bottom-right)
+  stroke(nR, nB, nR, nT, 220);           // right vertical
+
+  // ── R  (centered at x = 0.72) ────────────────────────────────
+  // Dimensions: width = 1.10, height = 1.30
+  const rL = 0.17, rT = 0.65, rB = -0.65, rMid = 0.03;
+  const bowlRx = 0.55, bowlRy = (rT - rMid) / 2, bowlCy = (rT + rMid) / 2;
+  stroke(rL, rB, rL, rT, 220);                          // left vertical
+  arc(rL, bowlCy, bowlRx, bowlRy, Math.PI/2, -Math.PI/2, 220); // bowl (PI/2→-PI/2 sweeps right)
+  stroke(rL + bowlRx * 0.45, rMid + 0.08, rL + bowlRx * 1.05, rB, 160); // leg diagonal
+
+  // ── Subtle dot-line beneath letters (name suggestion) ────────
+  for (let i = 0; i < 120; i++) {
+    const t = i / 119;
+    cardPoints.push([-1.6 + t * 3.2 + jitter()*3, -1.08 + jitter()*1.5, jitter()*2]);
   }
 
   const N = Math.min(cardPoints.length, PARTICLE_COUNT);
