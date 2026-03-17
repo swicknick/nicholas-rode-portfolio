@@ -734,6 +734,59 @@
     text-transform: uppercase;
   }
 
+  /* ─── CONTACT ─── */
+  #contact {
+    position: relative; z-index: 1;
+    padding: 100px 40px 120px;
+    max-width: 720px; margin: 0 auto;
+  }
+  #contact .section-label { margin-bottom: 12px; }
+  #contact .section-title { margin-bottom: 16px; }
+  #contact .section-sub {
+    font-size: 15px; color: var(--text-secondary);
+    line-height: 1.6; margin-bottom: 48px;
+  }
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-field { display: flex; flex-direction: column; gap: 8px; }
+  .form-field label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    color: var(--text-muted); text-transform: uppercase;
+  }
+  .form-field input,
+  .form-field textarea {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    resize: none;
+  }
+  .form-field input:focus,
+  .form-field textarea:focus {
+    border-color: var(--accent);
+    background: rgba(158,197,232,0.04);
+  }
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: var(--text-muted); opacity: 0.5; }
+  .form-field textarea { min-height: 140px; }
+  .form-submit {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  #form-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--accent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  #form-status.error { color: #e26f50; }
+  #form-status.visible { opacity: 1; }
+
   /* ─── FOOTER ─── */
   #footer {
     position: relative; z-index: 1;
@@ -831,6 +884,8 @@
 
     .section-divider { padding: 0 20px; }
 
+    #contact { padding: 80px 20px 80px; }
+    .form-row { grid-template-columns: 1fr; }
     #footer { flex-direction: column; align-items: flex-start; gap: 20px; padding: 40px 20px; }
     .footer-links { gap: 20px; }
   }
@@ -870,9 +925,9 @@
     <li><a href="#work">Works</a></li>
     <li><a href="#blog">Blog</a></li>
     <li><a href="#card-scanner">About</a></li>
-    <li><a href="mailto:hello@nicholasrode.com">Contact</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="mailto:hello@nicholasrode.com" class="nav-cta">Get in touch</a>
+  <a href="#contact" class="nav-cta">Get in touch</a>
 </nav>
 
 <!-- Hero -->
@@ -894,7 +949,7 @@
       View work
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
-    <a href="mailto:hello@nicholasrode.com" class="btn-secondary">Let's work together</a>
+    <a href="#contact" class="btn-secondary">Let's work together</a>
   </div>
 
   <div class="hero-scroll-hint">
@@ -1155,6 +1210,34 @@
   <div class="scanner-hint">Hover to interact · Click to explode</div>
 </section>
 
+<!-- Contact -->
+<section id="contact">
+  <p class="section-label">// contact</p>
+  <h2 class="section-title">Let's work together</h2>
+  <p class="section-sub">Have a project in mind? Drop me a message and I'll get back to you.</p>
+
+  <form class="contact-form" id="contact-form">
+    <div class="form-row">
+      <div class="form-field">
+        <label for="cf-name">Name</label>
+        <input type="text" id="cf-name" name="name" placeholder="Your name" required>
+      </div>
+      <div class="form-field">
+        <label for="cf-email">Email</label>
+        <input type="email" id="cf-email" name="email" placeholder="your@email.com" required>
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="cf-message">Message</label>
+      <textarea id="cf-message" name="message" placeholder="Tell me about your project..." required></textarea>
+    </div>
+    <div class="form-submit">
+      <button type="submit" class="btn-primary">Send message</button>
+      <span id="form-status"></span>
+    </div>
+  </form>
+</section>
+
 <!-- Footer -->
 <footer>
   <div id="footer">
@@ -1162,8 +1245,7 @@
     <ul class="footer-links">
       <li><a href="#work">Work</a></li>
       <li><a href="#blog">Blog</a></li>
-      <li><a href="https://nicholasrode.framer.website/" target="_blank">Framer Site</a></li>
-      <li><a href="mailto:hello@nicholasrode.com">Contact</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="footer-copy">© 2025 Nicholas Rode</div>
   </div>
@@ -1237,6 +1319,42 @@ window.addEventListener('load', () => {
 // ─── FORCE SCROLL TO TOP ON LOAD ──────────────────────────────
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
+
+// ─── CONTACT FORM ─────────────────────────────────────────────
+// To activate: go to formspree.io, create a free form with theniceguynick@gmail.com,
+// then replace YOUR_FORM_ID below with the ID they give you (e.g. "xpwzgkbd")
+const FORMSPREE_ID = 'YOUR_FORM_ID';
+
+document.getElementById('contact-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]');
+  const status = document.getElementById('form-status');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  status.className = '';
+  status.classList.remove('visible', 'error');
+
+  try {
+    const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(e.target),
+    });
+    if (res.ok) {
+      status.textContent = '✓ Message sent — I\'ll be in touch soon.';
+      status.classList.add('visible');
+      e.target.reset();
+    } else {
+      throw new Error();
+    }
+  } catch {
+    status.textContent = 'Something went wrong — try emailing theniceguynick@gmail.com directly.';
+    status.classList.add('visible', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send message';
+  }
+});
 
 // ─── SCROLL PROGRESS ──────────────────────────────────────────
 const scrollBar = document.getElementById('scroll-progress-bar');
