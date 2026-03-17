@@ -1319,6 +1319,7 @@ window.addEventListener('load', () => {
 // ─── FORCE SCROLL TO TOP ON LOAD ──────────────────────────────
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
+window.addEventListener('pageshow', (e) => { if (e.persisted) window.scrollTo(0, 0); });
 
 // ─── CONTACT FORM ─────────────────────────────────────────────
 document.getElementById('contact-form').addEventListener('submit', async (e) => {
